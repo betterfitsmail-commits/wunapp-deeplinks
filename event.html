@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Event - Wun</title>
+  <meta name="apple-itunes-app" content="app-id=6738779331">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 30px;
+      color: #9333EA;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 15px;
+    }
+    .button {
+      background: #9333EA;
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      display: inline-block;
+      margin: 20px 10px;
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .button:hover {
+      background: #7C3AED;
+    }
+    .button:active {
+      background: #6D28D9;
+    }
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .button-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .loading {
+      opacity: 0.7;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    .app-store-link {
+      color: #9333EA;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .app-store-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Wun</div>
+    <h1>Opening Event in Wun App...</h1>
+    <p>If the app doesn't open automatically, tap the button below:</p>
+    <button class="button" id="openAppBtn">Open in App</button>
+    <p class="loading" id="loadingText">Trying to open app...</p>
+    <p style="margin-top: 40px; opacity: 0.7; font-size: 14px;">
+      Don't have the app? 
+      <a href="https://apps.apple.com/app/id6738779331" class="app-store-link" target="_blank">Download from App Store</a>
+    </p>
+  </div>
+  
+  <script>
+    // Get event ID from URL
+    function getEventId() {
+      const path = window.location.pathname;
+      // Handle both /event/[id] and /event/[id].html
+      const match = path.match(/\/event\/([^\/]+)/);
+      if (match && match[1]) {
+        return match[1].replace('.html', '');
+      }
+      return null;
+    }
+    
+    const eventId = getEventId();
+    const appScheme = 'myapp://event/';
+    const universalLink = eventId ? `https://wunapp.shop/event/${eventId}` : '';
+    
+    // Update button link
+    const openAppBtn = document.getElementById('openAppBtn');
+    const loadingText = document.getElementById('loadingText');
+    
+    function tryOpenApp() {
+      if (!eventId) {
+        loadingText.textContent = 'Event ID not found in URL';
+        return;
+      }
+      
+      // Try universal link first (works better on iOS)
+      if (universalLink) {
+        window.location.href = universalLink;
+      } else {
+        // Fallback to custom scheme
+        window.location.href = `${appScheme}${eventId}`;
+      }
+      
+      // Show message after delay
+      setTimeout(() => {
+        loadingText.textContent = 'If the app didn\'t open, make sure you have Wun installed.';
+      }, 1500);
+    }
+    
+    // Auto-try to open app on page load
+    setTimeout(() => {
+      tryOpenApp();
+    }, 100);
+    
+    // Manual button click
+    if (openAppBtn) {
+      openAppBtn.addEventListener('click', () => {
+        tryOpenApp();
+      });
+    }
+    
+    // Update button text
+    if (openAppBtn && eventId) {
+      openAppBtn.textContent = 'Open Event in App';
+    }
+  </script>
+</body>
+</html>
