@@ -18,5 +18,11 @@
         }
       ]
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/event/:id",
+      "destination": "/event.html"
+    }
   ]
 }
