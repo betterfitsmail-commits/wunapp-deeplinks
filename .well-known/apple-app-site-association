@@ -1,0 +1,14 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "RNF74WLF27.app.rork.event-ticketing-platform-8a79kw6",
+        "paths": [
+          "/event/*",
+          "/profile/*"
+        ]
+      }
+    ]
+  }
+}
