@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Music - Wun</title>
+  <meta name="apple-itunes-app" content="app-id=6738779331">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 30px;
+      color: #9333EA;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 15px;
+    }
+    .button {
+      background: #9333EA;
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      display: inline-block;
+      margin: 20px 0;
+      font-weight: 600;
+      transition: background 0.2s;
+    }
+    .button:hover {
+      background: #7C3AED;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Wun</div>
+    <h1>Open in Wun App</h1>
+    <p>This link will open in the Wun app if you have it installed.</p>
+    <p>If you don't have the app, download it from the App Store.</p>
+    <a href="#" id="openApp" class="button">Open in App</a>
+    <p style="margin-top: 30px; font-size: 14px; opacity: 0.7;">
+      Don't have the app? <a href="https://apps.apple.com/app/wun/id6738779331" style="color: #9333EA;">Download from App Store</a>
+    </p>
+  </div>
+
+  <script>
+    // Extract music ID from URL
+    const path = window.location.pathname;
+    const musicIdMatch = path.match(/\/music\/([^\/]+)/);
+    const musicId = musicIdMatch ? musicIdMatch[1] : null;
+
+    // Try to open the app
+    const openApp = () => {
+      if (musicId) {
+        // Try universal link first (iOS)
+        window.location.href = `https://wunapp.shop/music/${musicId}`;
+        
+        // Fallback to custom scheme (Android/older iOS)
+        setTimeout(() => {
+          window.location.href = `wunapp://music/${musicId}`;
+        }, 500);
+      } else {
+        // No ID, just open app
+        window.location.href = 'wunapp://';
+      }
+    };
+
+    // Auto-attempt to open app
+    openApp();
+
+    // Also make button clickable
+    document.getElementById('openApp').addEventListener('click', (e) => {
+      e.preventDefault();
+      openApp();
+    });
+  </script>
+</body>
+</html>
