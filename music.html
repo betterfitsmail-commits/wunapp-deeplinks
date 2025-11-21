@@ -78,30 +78,43 @@
     const musicIdMatch = path.match(/\/music\/([^\/]+)/);
     const musicId = musicIdMatch ? musicIdMatch[1] : null;
 
-    // Try to open the app
-    const openApp = () => {
+    // Try to open the app (only on user interaction to prevent refresh loops)
+    const openApp = (e) => {
+      if (e) {
+        e.preventDefault();
+      }
+
       if (musicId) {
-        // Try universal link first (iOS)
-        window.location.href = `https://wunapp.shop/music/${musicId}`;
+        // Use a hidden iframe to avoid page reload
+        const appUrl = `wunapp://music/${musicId}`;
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = appUrl;
+        document.body.appendChild(iframe);
         
-        // Fallback to custom scheme (Android/older iOS)
+        // Remove iframe after a short delay
         setTimeout(() => {
-          window.location.href = `wunapp://music/${musicId}`;
-        }, 500);
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
       } else {
         // No ID, just open app
-        window.location.href = 'wunapp://';
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.src = 'wunapp://';
+        document.body.appendChild(iframe);
+        setTimeout(() => {
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 2000);
       }
     };
 
-    // Auto-attempt to open app
-    openApp();
-
-    // Also make button clickable
-    document.getElementById('openApp').addEventListener('click', (e) => {
-      e.preventDefault();
-      openApp();
-    });
+    // Only make button clickable - NO auto-attempt to prevent refresh loops
+    document.getElementById('openApp').addEventListener('click', openApp);
   </script>
 </body>
 </html>
+
