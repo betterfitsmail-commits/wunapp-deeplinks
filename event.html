@@ -112,49 +112,61 @@
     }
     
     const eventId = getEventId();
-    const appScheme = 'myapp://event/';
-    const universalLink = eventId ? `https://wunapp.shop/event/${eventId}` : '';
+    const appScheme = 'wunapp://event/';
     
     // Update button link
     const openAppBtn = document.getElementById('openAppBtn');
     const loadingText = document.getElementById('loadingText');
     
-    function tryOpenApp() {
+    // Update UI on load
+    if (loadingText) {
+      loadingText.textContent = 'Tap the button below to open in the app.';
+    }
+    if (openAppBtn && eventId) {
+      openAppBtn.textContent = 'Open Event in App';
+    }
+    
+    function tryOpenApp(e) {
+      if (e) {
+        e.preventDefault();
+      }
+
       if (!eventId) {
-        loadingText.textContent = 'Event ID not found in URL';
+        if (loadingText) {
+          loadingText.textContent = 'Event ID not found in URL';
+        }
         return;
       }
       
-      // Try universal link first (works better on iOS)
-      if (universalLink) {
-        window.location.href = universalLink;
-      } else {
-        // Fallback to custom scheme
-        window.location.href = `${appScheme}${eventId}`;
-      }
+      // Use a hidden iframe to avoid page reload
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = `${appScheme}${eventId}`;
+      document.body.appendChild(iframe);
+      
+      // Remove iframe after a short delay
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+      }, 2000);
       
       // Show message after delay
       setTimeout(() => {
-        loadingText.textContent = 'If the app didn\'t open, make sure you have Wun installed.';
-      }, 1500);
+        if (loadingText) {
+          loadingText.textContent = 'If the app didn\'t open, make sure you have Wun installed.';
+        }
+        if (openAppBtn) {
+          openAppBtn.textContent = 'Tap to Open in App';
+        }
+      }, 1000);
     }
     
-    // Auto-try to open app on page load
-    setTimeout(() => {
-      tryOpenApp();
-    }, 100);
-    
-    // Manual button click
+    // Only manual button click - NO auto-attempt to prevent refresh loops
     if (openAppBtn) {
-      openAppBtn.addEventListener('click', () => {
-        tryOpenApp();
-      });
-    }
-    
-    // Update button text
-    if (openAppBtn && eventId) {
-      openAppBtn.textContent = 'Open Event in App';
+      openAppBtn.addEventListener('click', tryOpenApp);
     }
   </script>
 </body>
 </html>
+
