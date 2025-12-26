@@ -76,44 +76,18 @@
     // Extract username from URL
     const path = window.location.pathname;
     const profileMatch = path.match(/\/profile\/([^\/]+)/);
-    const username = profileMatch ? profileMatch[1] : null;
+    const username = profileMatch ? decodeURIComponent(profileMatch[1]) : null;
 
-    // Try to open the app (only on user interaction to prevent refresh loops)
-    const openApp = (e) => {
-      if (e) {
-        e.preventDefault();
-      }
-
-      if (username) {
-        // Use a hidden iframe to avoid page reload
-        const appUrl = `wunapp://profile/${username}`;
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = appUrl;
-        document.body.appendChild(iframe);
-        
-        // Remove iframe after a short delay
-        setTimeout(() => {
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-        }, 2000);
-      } else {
-        // No username, just open app
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = 'wunapp://';
-        document.body.appendChild(iframe);
-        setTimeout(() => {
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-        }, 2000);
-      }
-    };
-
-    // Only make button clickable - NO auto-attempt to prevent refresh loops
-    document.getElementById('openApp').addEventListener('click', openApp);
+    const openAppBtn = document.getElementById('openApp');
+    
+    // Set href directly - the most reliable method
+    if (openAppBtn && username) {
+      openAppBtn.href = 'wunapp://profile/' + encodeURIComponent(username);
+      openAppBtn.textContent = 'Tap to Open in App';
+    } else if (openAppBtn) {
+      openAppBtn.textContent = 'Profile not found';
+      openAppBtn.style.opacity = '0.5';
+    }
   </script>
 </body>
 </html>
