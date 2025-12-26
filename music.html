@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Music - Wun</title>
   <meta name="apple-itunes-app" content="app-id=6738779331">
+  <meta property="og:title" content="Music - Wun">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="">
+  <link rel="canonical" href="">
   <style>
     * {
       margin: 0;
@@ -66,7 +70,7 @@
     <h1>Open in Wun App</h1>
     <p>This link will open in the Wun app if you have it installed.</p>
     <p>If you don't have the app, download it from the App Store.</p>
-    <a href="#" id="openApp" class="button">Open in App</a>
+    <a href="#" id="openApp" class="button">Tap to Open in App</a>
     <p style="margin-top: 30px; font-size: 14px; opacity: 0.7;">
       Don't have the app? <a href="https://apps.apple.com/app/wun/id6738779331" style="color: #9333EA;">Download from App Store</a>
     </p>
@@ -76,44 +80,18 @@
     // Extract music ID from URL
     const path = window.location.pathname;
     const musicIdMatch = path.match(/\/music\/([^\/]+)/);
-    const musicId = musicIdMatch ? musicIdMatch[1] : null;
+    const musicId = musicIdMatch ? decodeURIComponent(musicIdMatch[1]) : null;
 
-    // Try to open the app (only on user interaction to prevent refresh loops)
-    const openApp = (e) => {
-      if (e) {
-        e.preventDefault();
-      }
+    const openAppBtn = document.getElementById('openApp');
 
+    // Set href directly - the most reliable method
+    if (openAppBtn) {
       if (musicId) {
-        // Use a hidden iframe to avoid page reload
-        const appUrl = `wunapp://music/${musicId}`;
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = appUrl;
-        document.body.appendChild(iframe);
-        
-        // Remove iframe after a short delay
-        setTimeout(() => {
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-        }, 2000);
+        openAppBtn.href = 'wunapp://music/' + encodeURIComponent(musicId);
       } else {
-        // No ID, just open app
-        const iframe = document.createElement('iframe');
-        iframe.style.display = 'none';
-        iframe.src = 'wunapp://';
-        document.body.appendChild(iframe);
-        setTimeout(() => {
-          if (document.body.contains(iframe)) {
-            document.body.removeChild(iframe);
-          }
-        }, 2000);
+        openAppBtn.href = 'wunapp://';
       }
-    };
-
-    // Only make button clickable - NO auto-attempt to prevent refresh loops
-    document.getElementById('openApp').addEventListener('click', openApp);
+    }
   </script>
 </body>
 </html>
