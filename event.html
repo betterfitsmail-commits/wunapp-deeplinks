@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Event - Wun</title>
   <meta name="apple-itunes-app" content="app-id=6738779331">
+  <meta property="og:title" content="Event - Wun">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="">
+  <link rel="canonical" href="">
   <style>
     * {
       margin: 0;
@@ -91,7 +95,7 @@
     <div class="logo">Wun</div>
     <h1>Opening Event in Wun App...</h1>
     <p>If the app doesn't open automatically, tap the button below:</p>
-    <button class="button" id="openAppBtn">Open in App</button>
+    <a class="button" id="openAppBtn" href="#">Tap to Open in App</a>
     <p class="loading" id="loadingText">Trying to open app...</p>
     <p style="margin-top: 40px; opacity: 0.7; font-size: 14px;">
       Don't have the app? 
@@ -101,70 +105,39 @@
   
   <script>
     // Get event ID from URL
-    function getEventId() {
-      const path = window.location.pathname;
-      // Handle both /event/[id] and /event/[id].html
-      const match = path.match(/\/event\/([^\/]+)/);
-      if (match && match[1]) {
-        return match[1].replace('.html', '');
-      }
-      return null;
-    }
+    const path = window.location.pathname;
+    const match = path.match(/\/event\/([^\/]+)/);
+    const eventId = match ? match[1].replace('.html', '') : null;
     
-    const eventId = getEventId();
-    const appScheme = 'wunapp://event/';
-    
-    // Update button link
     const openAppBtn = document.getElementById('openAppBtn');
     const loadingText = document.getElementById('loadingText');
     
-    // Update UI on load
+    // Update UI
     if (loadingText) {
-      loadingText.textContent = 'Tap the button below to open in the app.';
+      loadingText.textContent = 'Tap the button to open in the app';
     }
+    
+    // Set the href directly on the anchor tag - this is the most reliable method
     if (openAppBtn && eventId) {
-      openAppBtn.textContent = 'Open Event in App';
-    }
-    
-    function tryOpenApp(e) {
-      if (e) {
-        e.preventDefault();
-      }
-
-      if (!eventId) {
+      const deepLink = 'wunapp://event/' + encodeURIComponent(eventId);
+      openAppBtn.href = deepLink;
+      
+      // Also handle click for better UX
+      openAppBtn.onclick = function() {
         if (loadingText) {
-          loadingText.textContent = 'Event ID not found in URL';
+          loadingText.textContent = 'Opening app...';
         }
-        return;
-      }
-      
-      // Use a hidden iframe to avoid page reload
-      const iframe = document.createElement('iframe');
-      iframe.style.display = 'none';
-      iframe.src = `${appScheme}${eventId}`;
-      document.body.appendChild(iframe);
-      
-      // Remove iframe after a short delay
-      setTimeout(() => {
-        if (document.body.contains(iframe)) {
-          document.body.removeChild(iframe);
-        }
-      }, 2000);
-      
-      // Show message after delay
-      setTimeout(() => {
-        if (loadingText) {
-          loadingText.textContent = 'If the app didn\'t open, make sure you have Wun installed.';
-        }
-        if (openAppBtn) {
-          openAppBtn.textContent = 'Tap to Open in App';
-        }
-      }, 1000);
-    }
-    
-    // Only manual button click - NO auto-attempt to prevent refresh loops
-    if (openAppBtn) {
-      openAppBtn.addEventListener('click', tryOpenApp);
+        // Let the default href behavior handle the navigation
+        setTimeout(function() {
+          if (loadingText) {
+            loadingText.textContent = 'If the app didn\'t open, make sure Wun is installed.';
+          }
+        }, 2000);
+        return true; // Allow default behavior (follow href)
+      };
+    } else if (openAppBtn) {
+      openAppBtn.textContent = 'Event not found';
+      openAppBtn.style.opacity = '0.5';
     }
   </script>
 </body>
