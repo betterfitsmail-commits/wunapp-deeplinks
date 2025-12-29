@@ -175,6 +175,8 @@
     <p>If the app doesn't open automatically, tap the button below:</p>
     <a class="button" id="openAppBtn" href="#">Tap to Open in App</a>
     <p class="loading" id="loadingText">Trying to open app...</p>
+    <!-- Test button - click this to see the red modal immediately -->
+    <button type="button" onclick="window.showModal()" style="background: #dc2626; color: white; padding: 12px 24px; margin-top: 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600;">Test Red Warning Modal</button>
     <p style="margin-top: 40px; opacity: 0.7; font-size: 14px;">
       Don't have the app? 
       <a href="https://apps.apple.com/app/id6738779331" class="app-store-link" target="_blank">Download from App Store</a>
@@ -217,9 +219,14 @@
     
     // Modal functions - make them globally accessible
     window.showModal = function() {
+      console.log('[Event] showModal called');
       const modal = document.getElementById('errorModal');
+      console.log('[Event] Modal element:', modal);
       if (modal) {
         modal.classList.add('show');
+        console.log('[Event] Modal should now be visible, classList:', modal.classList.toString());
+      } else {
+        console.error('[Event] Modal element not found!');
       }
     };
     
@@ -240,7 +247,9 @@
 
     // Function to try opening the app
     function tryOpenApp() {
+      console.log('[Event] Button clicked, trying to open app...');
       if (!eventId) {
+        console.log('[Event] No eventId found');
         if (loadingText) {
           loadingText.textContent = 'Event not found';
         }
@@ -248,12 +257,17 @@
           openAppBtn.textContent = 'Event not found';
           openAppBtn.style.opacity = '0.5';
         }
+        // Show modal if no event ID
+        setTimeout(() => {
+          window.showModal();
+        }, 500);
         return;
       }
       
       if (loadingText) {
         loadingText.textContent = 'Opening app...';
       }
+      console.log('[Event] Event ID:', eventId);
       
       // Track if we're still on the page (app didn't open)
       let stillOnPage = true;
@@ -294,8 +308,10 @@
             
             // Check if we're still on the page after 2 seconds
             setTimeout(function() {
+              console.log('[Event] Checking if app opened...', { stillOnPage, hidden: document.hidden });
               if (stillOnPage && !document.hidden) {
                 // App didn't open, show error modal
+                console.log('[Event] App did not open, showing red modal');
                 window.showModal();
                 if (loadingText) {
                   loadingText.textContent = 'Tap the button to try again';
@@ -326,14 +342,31 @@
       openAppBtn.href = window.location.origin + '/event/' + encodeURIComponent(eventId);
       
       // Handle click with fallback
-      openAppBtn.onclick = function(e) {
+      openAppBtn.addEventListener('click', function(e) {
+        console.log('[Event] Button click event fired');
         e.preventDefault();
+        e.stopPropagation();
+        tryOpenApp();
+        return false;
+      }, false);
+      
+      // Also handle onclick as backup
+      openAppBtn.onclick = function(e) {
+        console.log('[Event] Button onclick fired');
+        e.preventDefault();
+        e.stopPropagation();
         tryOpenApp();
         return false;
       };
     } else if (openAppBtn) {
       openAppBtn.textContent = 'Event not found';
       openAppBtn.style.opacity = '0.5';
+      openAppBtn.href = '#';
+      openAppBtn.onclick = function(e) {
+        e.preventDefault();
+        window.showModal();
+        return false;
+      };
     }
     
     // Auto-try on page load (optional - can be removed if you want user to click button)
