@@ -175,8 +175,6 @@
     <p>If the app doesn't open automatically, tap the button below:</p>
     <a class="button" id="openAppBtn" href="#">Tap to Open in App</a>
     <p class="loading" id="loadingText">Trying to open app...</p>
-    <!-- Test button - click this to see the red modal immediately -->
-    <button type="button" onclick="window.showModal()" style="background: #dc2626; color: white; padding: 12px 24px; margin-top: 20px; border-radius: 12px; border: none; cursor: pointer; font-weight: 600;">Test Red Warning Modal</button>
     <p style="margin-top: 40px; opacity: 0.7; font-size: 14px;">
       Don't have the app? 
       <a href="https://apps.apple.com/app/id6738779331" class="app-store-link" target="_blank">Download from App Store</a>
@@ -279,20 +277,38 @@
         }
       }, 100);
       
-      // Try universal link first (works in production/TestFlight)
-      const universalLink = window.location.origin + '/event/' + encodeURIComponent(eventId);
-      
       // Try custom scheme (works in production/TestFlight, not in Expo Go)
       const customScheme = 'wunapp://event/' + encodeURIComponent(eventId);
       
-      // Try universal link first
+      // Try custom scheme immediately using iframe trick
       try {
-        window.location.href = universalLink;
+        const iframe = document.createElement('iframe');
+        iframe.style.display = 'none';
+        iframe.style.width = '0';
+        iframe.style.height = '0';
+        iframe.src = customScheme;
+        document.body.appendChild(iframe);
+        
+        // Remove iframe quickly
+        setTimeout(function() {
+          if (document.body.contains(iframe)) {
+            document.body.removeChild(iframe);
+          }
+        }, 100);
       } catch (e) {
-        console.log('Universal link failed, trying custom scheme');
+        console.log('[Event] Custom scheme iframe failed:', e);
       }
       
-      // Fallback to custom scheme after a short delay
+      // Also try direct navigation as fallback
+      setTimeout(function() {
+        try {
+          window.location.href = customScheme;
+        } catch (e) {
+          console.log('[Event] Direct navigation failed:', e);
+        }
+      }, 100);
+      
+      // Check if app opened after a delay
       setTimeout(function() {
         try {
           // Only try custom scheme if universal link didn't work
@@ -338,26 +354,41 @@
     
     // Set up button
     if (openAppBtn && eventId) {
-      // Use universal link as href (more reliable, works in production)
-      openAppBtn.href = window.location.origin + '/event/' + encodeURIComponent(eventId);
+      // Use custom scheme as href (direct deep link)
+      const customScheme = 'wunapp://event/' + encodeURIComponent(eventId);
+      openAppBtn.href = customScheme;
       
-      // Handle click with fallback
+      // Track if app opens when link is clicked
+      let linkClicked = false;
+      let stillOnPage = true;
+      
+      // Handle click - track that button was clicked
       openAppBtn.addEventListener('click', function(e) {
-        console.log('[Event] Button click event fired');
-        e.preventDefault();
-        e.stopPropagation();
-        tryOpenApp();
-        return false;
+        console.log('[Event] Button clicked, attempting to open app...');
+        linkClicked = true;
+        stillOnPage = true;
+        
+        // Start checking if we're still on the page
+        const checkInterval = setInterval(function() {
+          if (document.hidden) {
+            stillOnPage = false;
+            clearInterval(checkInterval);
+            console.log('[Event] App opened successfully');
+          }
+        }, 100);
+        
+        // Check after 2 seconds if app didn't open
+        setTimeout(function() {
+          clearInterval(checkInterval);
+          if (stillOnPage && !document.hidden && linkClicked) {
+            console.log('[Event] App did not open, showing red modal');
+            window.showModal();
+            if (loadingText) {
+              loadingText.textContent = 'Tap the button to try again';
+            }
+          }
+        }, 2000);
       }, false);
-      
-      // Also handle onclick as backup
-      openAppBtn.onclick = function(e) {
-        console.log('[Event] Button onclick fired');
-        e.preventDefault();
-        e.stopPropagation();
-        tryOpenApp();
-        return false;
-      };
     } else if (openAppBtn) {
       openAppBtn.textContent = 'Event not found';
       openAppBtn.style.opacity = '0.5';
