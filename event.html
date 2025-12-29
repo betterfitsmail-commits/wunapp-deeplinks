@@ -194,7 +194,7 @@
         <a href="https://apps.apple.com/app/id6738779331" class="modal-button" target="_blank">
           Download from App Store
         </a>
-        <button class="modal-button modal-button-secondary" onclick="closeModal()">
+        <button type="button" class="modal-button modal-button-secondary" onclick="window.closeModal()">
           Close
         </button>
       </div>
@@ -215,20 +215,20 @@
       loadingText.textContent = 'Tap the button to open in the app';
     }
     
-    // Modal functions
-    function showModal() {
+    // Modal functions - make them globally accessible
+    window.showModal = function() {
       const modal = document.getElementById('errorModal');
       if (modal) {
         modal.classList.add('show');
       }
-    }
+    };
     
-    function closeModal() {
+    window.closeModal = function() {
       const modal = document.getElementById('errorModal');
       if (modal) {
         modal.classList.remove('show');
       }
-    }
+    };
     
     // Close modal when clicking outside
     document.addEventListener('click', function(e) {
@@ -296,7 +296,7 @@
             setTimeout(function() {
               if (stillOnPage && !document.hidden) {
                 // App didn't open, show error modal
-                showModal();
+                window.showModal();
                 if (loadingText) {
                   loadingText.textContent = 'Tap the button to try again';
                 }
@@ -311,7 +311,7 @@
           // Show error modal if app didn't open
           setTimeout(function() {
             if (stillOnPage && !document.hidden) {
-              showModal();
+              window.showModal();
             } else if (loadingText) {
               loadingText.textContent = 'If the app didn\'t open, make sure Wun is installed.';
             }
