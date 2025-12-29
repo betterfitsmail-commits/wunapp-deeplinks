@@ -167,7 +167,7 @@
         <a href="https://apps.apple.com/app/id6738779331" class="modal-button" target="_blank">
           Download from App Store
         </a>
-        <button class="modal-button modal-button-secondary" onclick="closeModal()">
+        <button type="button" class="modal-button modal-button-secondary" onclick="window.closeModal()">
           Close
         </button>
       </div>
@@ -182,20 +182,20 @@
 
     const openAppBtn = document.getElementById('openApp');
 
-    // Modal functions
-    function showModal() {
+    // Modal functions - make them globally accessible
+    window.showModal = function() {
       const modal = document.getElementById('errorModal');
       if (modal) {
         modal.classList.add('show');
       }
-    }
+    };
     
-    function closeModal() {
+    window.closeModal = function() {
       const modal = document.getElementById('errorModal');
       if (modal) {
         modal.classList.remove('show');
       }
-    }
+    };
     
     // Close modal when clicking outside
     document.addEventListener('click', function(e) {
@@ -237,7 +237,7 @@
           
           setTimeout(function() {
             if (stillOnPage && !document.hidden) {
-              showModal();
+              window.showModal();
             }
           }, 2000);
         }, 1000);
@@ -246,7 +246,7 @@
         clearInterval(pageVisibilityCheck);
         setTimeout(function() {
           if (stillOnPage && !document.hidden) {
-            showModal();
+            window.showModal();
           }
         }, 2000);
       }
