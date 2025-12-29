@@ -173,7 +173,7 @@
     <div class="logo">Wun</div>
     <h1>Opening Post in Wun App...</h1>
     <p>If the app doesn't open automatically, tap the button below:</p>
-    <button class="button" id="openAppBtn">Open in App</button>
+    <button type="button" class="button" id="openAppBtn">Open in App</button>
     <p class="loading" id="loadingText">Trying to open app...</p>
     <p style="margin-top: 40px; opacity: 0.7; font-size: 14px;">
       Don't have the app? 
@@ -194,7 +194,7 @@
         <a href="https://apps.apple.com/app/id6738779331" class="modal-button" target="_blank">
           Download from App Store
         </a>
-        <button class="modal-button modal-button-secondary" onclick="closeModal()">
+        <button type="button" class="modal-button modal-button-secondary" onclick="window.closeModal()">
           Close
         </button>
       </div>
@@ -228,20 +228,20 @@
       openAppBtn.textContent = 'Open Post in App';
     }
     
-    // Modal functions
-    function showModal() {
+    // Modal functions - make them globally accessible
+    window.showModal = function() {
       const modal = document.getElementById('errorModal');
       if (modal) {
         modal.classList.add('show');
       }
-    }
+    };
     
-    function closeModal() {
+    window.closeModal = function() {
       const modal = document.getElementById('errorModal');
       if (modal) {
         modal.classList.remove('show');
       }
-    }
+    };
     
     // Close modal when clicking outside
     document.addEventListener('click', function(e) {
@@ -288,7 +288,7 @@
         setTimeout(() => {
           if (stillOnPage && !document.hidden) {
             // App didn't open, show error modal
-            showModal();
+            window.showModal();
             if (loadingText) {
               loadingText.textContent = 'Tap the button to try again';
             }
@@ -306,3 +306,4 @@
   </script>
 </body>
 </html>
+
