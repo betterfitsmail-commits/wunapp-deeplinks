@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Post - Wun</title>
+  <meta name="apple-itunes-app" content="app-id=6738779331">
+  <meta property="og:title" content="Post - Wun">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="">
+  <link rel="canonical" href="">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #000000;
+      color: #ffffff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      width: 100%;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .logo {
+      font-size: 32px;
+      font-weight: 800;
+      margin-bottom: 30px;
+      color: #9333EA;
+    }
+    h1 {
+      font-size: 24px;
+      margin-bottom: 20px;
+      font-weight: 700;
+    }
+    p {
+      font-size: 16px;
+      line-height: 1.6;
+      opacity: 0.9;
+      margin-bottom: 15px;
+    }
+    .button {
+      background: #9333EA;
+      color: white;
+      padding: 16px 32px;
+      border-radius: 12px;
+      text-decoration: none;
+      display: inline-block;
+      margin: 20px 10px;
+      font-weight: 600;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .button:hover {
+      background: #7C3AED;
+    }
+    .button:active {
+      background: #6D28D9;
+    }
+    .button-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .button-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .loading {
+      opacity: 0.7;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    .app-store-link {
+      color: #9333EA;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .app-store-link:hover {
+      text-decoration: underline;
+    }
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal-content {
+      background: #dc2626;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 400px;
+      width: 100%;
+      border: 3px solid #991b1b;
+      box-shadow: 0 20px 60px rgba(220, 38, 38, 0.5);
+      text-align: center;
+    }
+    .modal-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+    .modal-message {
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 24px;
+    }
+    .modal-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-button {
+      background: #ffffff;
+      color: #dc2626;
+      padding: 14px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: block;
+    }
+    .modal-button:hover {
+      background: #f3f4f6;
+    }
+    .modal-button-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .modal-button-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="logo">Wun</div>
+    <h1>Opening Post in Wun App...</h1>
+    <p>If the app doesn't open automatically, tap the button below:</p>
+    <button class="button" id="openAppBtn">Open in App</button>
+    <p class="loading" id="loadingText">Trying to open app...</p>
+    <p style="margin-top: 40px; opacity: 0.7; font-size: 14px;">
+      Don't have the app? 
+      <a href="https://apps.apple.com/app/id6738779331" class="app-store-link" target="_blank">Download from App Store</a>
+    </p>
+  </div>
+
+  <!-- Error Modal -->
+  <div class="modal-overlay" id="errorModal">
+    <div class="modal-content">
+      <div class="modal-icon">⚠️</div>
+      <h2 class="modal-title">App Not Open</h2>
+      <p class="modal-message">
+        The app needs to be open first before opening this link.<br><br>
+        Please open the Wun app, then try again. If you don't have the app, download it from the App Store.
+      </p>
+      <div class="modal-buttons">
+        <a href="https://apps.apple.com/app/id6738779331" class="modal-button" target="_blank">
+          Download from App Store
+        </a>
+        <button class="modal-button modal-button-secondary" onclick="closeModal()">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // Get post ID from URL
+    function getPostId() {
+      const path = window.location.pathname;
+      // Handle both /post/[id] and /post/[id].html
+      const match = path.match(/\/post\/([^\/]+)/);
+      if (match && match[1]) {
+        return match[1].replace('.html', '');
+      }
+      return null;
+    }
+    
+    const postId = getPostId();
+    const appScheme = 'wunapp://post/';
+    
+    // Update button link
+    const openAppBtn = document.getElementById('openAppBtn');
+    const loadingText = document.getElementById('loadingText');
+    
+    // Update UI on load
+    if (loadingText) {
+      loadingText.textContent = 'Tap the button below to open in the app.';
+    }
+    if (openAppBtn && postId) {
+      openAppBtn.textContent = 'Open Post in App';
+    }
+    
+    // Modal functions
+    function showModal() {
+      const modal = document.getElementById('errorModal');
+      if (modal) {
+        modal.classList.add('show');
+      }
+    }
+    
+    function closeModal() {
+      const modal = document.getElementById('errorModal');
+      if (modal) {
+        modal.classList.remove('show');
+      }
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('errorModal');
+      if (modal && e.target === modal) {
+        closeModal();
+      }
+    });
+
+    function tryOpenApp(e) {
+      if (e) {
+        e.preventDefault();
+      }
+
+      if (!postId) {
+        if (loadingText) {
+          loadingText.textContent = 'Post ID not found in URL';
+        }
+        return;
+      }
+      
+      let stillOnPage = true;
+      const pageVisibilityCheck = setInterval(function() {
+        if (document.hidden) {
+          stillOnPage = false;
+          clearInterval(pageVisibilityCheck);
+        }
+      }, 100);
+      
+      // Use a hidden iframe to avoid page reload
+      const iframe = document.createElement('iframe');
+      iframe.style.display = 'none';
+      iframe.src = `${appScheme}${postId}`;
+      document.body.appendChild(iframe);
+      
+      // Remove iframe after a short delay
+      setTimeout(() => {
+        if (document.body.contains(iframe)) {
+          document.body.removeChild(iframe);
+        }
+        clearInterval(pageVisibilityCheck);
+        
+        // Check if app opened
+        setTimeout(() => {
+          if (stillOnPage && !document.hidden) {
+            // App didn't open, show error modal
+            showModal();
+            if (loadingText) {
+              loadingText.textContent = 'Tap the button to try again';
+            }
+          } else if (loadingText) {
+            loadingText.textContent = 'Opening app...';
+          }
+        }, 2000);
+      }, 1000);
+    }
+    
+    // Only manual button click - NO auto-attempt to prevent refresh loops
+    if (openAppBtn) {
+      openAppBtn.addEventListener('click', tryOpenApp);
+    }
+  </script>
+</body>
+</html>
