@@ -88,6 +88,84 @@
     .app-store-link:hover {
       text-decoration: underline;
     }
+    /* Modal Styles */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    .modal-overlay.show {
+      display: flex;
+    }
+    .modal-content {
+      background: #dc2626;
+      border-radius: 20px;
+      padding: 32px;
+      max-width: 400px;
+      width: 100%;
+      border: 3px solid #991b1b;
+      box-shadow: 0 20px 60px rgba(220, 38, 38, 0.5);
+      text-align: center;
+    }
+    .modal-icon {
+      width: 64px;
+      height: 64px;
+      margin: 0 auto 20px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+    }
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: #ffffff;
+    }
+    .modal-message {
+      font-size: 16px;
+      line-height: 1.6;
+      color: rgba(255, 255, 255, 0.95);
+      margin-bottom: 24px;
+    }
+    .modal-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-button {
+      background: #ffffff;
+      color: #dc2626;
+      padding: 14px 24px;
+      border-radius: 12px;
+      text-decoration: none;
+      font-weight: 700;
+      font-size: 16px;
+      border: none;
+      cursor: pointer;
+      transition: background 0.3s;
+      display: block;
+    }
+    .modal-button:hover {
+      background: #f3f4f6;
+    }
+    .modal-button-secondary {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+    .modal-button-secondary:hover {
+      background: rgba(255, 255, 255, 0.15);
+    }
   </style>
 </head>
 <body>
@@ -101,6 +179,26 @@
       Don't have the app? 
       <a href="https://apps.apple.com/app/id6738779331" class="app-store-link" target="_blank">Download from App Store</a>
     </p>
+  </div>
+
+  <!-- Error Modal -->
+  <div class="modal-overlay" id="errorModal">
+    <div class="modal-content">
+      <div class="modal-icon">⚠️</div>
+      <h2 class="modal-title">App Not Open</h2>
+      <p class="modal-message">
+        The app needs to be open first before opening this link.<br><br>
+        Please open the Wun app, then try again. If you don't have the app, download it from the App Store.
+      </p>
+      <div class="modal-buttons">
+        <a href="https://apps.apple.com/app/id6738779331" class="modal-button" target="_blank">
+          Download from App Store
+        </a>
+        <button class="modal-button modal-button-secondary" onclick="closeModal()">
+          Close
+        </button>
+      </div>
+    </div>
   </div>
   
   <script>
@@ -117,28 +215,129 @@
       loadingText.textContent = 'Tap the button to open in the app';
     }
     
-    // Set the href directly on the anchor tag - this is the most reliable method
-    if (openAppBtn && eventId) {
-      const deepLink = 'wunapp://event/' + encodeURIComponent(eventId);
-      openAppBtn.href = deepLink;
-      
-      // Also handle click for better UX
-      openAppBtn.onclick = function() {
+    // Modal functions
+    function showModal() {
+      const modal = document.getElementById('errorModal');
+      if (modal) {
+        modal.classList.add('show');
+      }
+    }
+    
+    function closeModal() {
+      const modal = document.getElementById('errorModal');
+      if (modal) {
+        modal.classList.remove('show');
+      }
+    }
+    
+    // Close modal when clicking outside
+    document.addEventListener('click', function(e) {
+      const modal = document.getElementById('errorModal');
+      if (modal && e.target === modal) {
+        closeModal();
+      }
+    });
+
+    // Function to try opening the app
+    function tryOpenApp() {
+      if (!eventId) {
         if (loadingText) {
-          loadingText.textContent = 'Opening app...';
+          loadingText.textContent = 'Event not found';
         }
-        // Let the default href behavior handle the navigation
-        setTimeout(function() {
-          if (loadingText) {
-            loadingText.textContent = 'If the app didn\'t open, make sure Wun is installed.';
-          }
-        }, 2000);
-        return true; // Allow default behavior (follow href)
+        if (openAppBtn) {
+          openAppBtn.textContent = 'Event not found';
+          openAppBtn.style.opacity = '0.5';
+        }
+        return;
+      }
+      
+      if (loadingText) {
+        loadingText.textContent = 'Opening app...';
+      }
+      
+      // Track if we're still on the page (app didn't open)
+      let stillOnPage = true;
+      const pageVisibilityCheck = setInterval(function() {
+        if (document.hidden) {
+          // Page is hidden, app likely opened
+          stillOnPage = false;
+          clearInterval(pageVisibilityCheck);
+        }
+      }, 100);
+      
+      // Try universal link first (works in production/TestFlight)
+      const universalLink = window.location.origin + '/event/' + encodeURIComponent(eventId);
+      
+      // Try custom scheme (works in production/TestFlight, not in Expo Go)
+      const customScheme = 'wunapp://event/' + encodeURIComponent(eventId);
+      
+      // Try universal link first
+      try {
+        window.location.href = universalLink;
+      } catch (e) {
+        console.log('Universal link failed, trying custom scheme');
+      }
+      
+      // Fallback to custom scheme after a short delay
+      setTimeout(function() {
+        try {
+          // Only try custom scheme if universal link didn't work
+          // This prevents the "invalid address" error in Safari
+          const iframe = document.createElement('iframe');
+          iframe.style.display = 'none';
+          iframe.src = customScheme;
+          document.body.appendChild(iframe);
+          
+          setTimeout(function() {
+            document.body.removeChild(iframe);
+            clearInterval(pageVisibilityCheck);
+            
+            // Check if we're still on the page after 2 seconds
+            setTimeout(function() {
+              if (stillOnPage && !document.hidden) {
+                // App didn't open, show error modal
+                showModal();
+                if (loadingText) {
+                  loadingText.textContent = 'Tap the button to try again';
+                }
+              } else if (loadingText) {
+                loadingText.textContent = 'Opening app...';
+              }
+            }, 2000);
+          }, 1000);
+        } catch (e) {
+          console.log('Custom scheme failed:', e);
+          clearInterval(pageVisibilityCheck);
+          // Show error modal if app didn't open
+          setTimeout(function() {
+            if (stillOnPage && !document.hidden) {
+              showModal();
+            } else if (loadingText) {
+              loadingText.textContent = 'If the app didn\'t open, make sure Wun is installed.';
+            }
+          }, 2000);
+        }
+      }, 500);
+    }
+    
+    // Set up button
+    if (openAppBtn && eventId) {
+      // Use universal link as href (more reliable, works in production)
+      openAppBtn.href = window.location.origin + '/event/' + encodeURIComponent(eventId);
+      
+      // Handle click with fallback
+      openAppBtn.onclick = function(e) {
+        e.preventDefault();
+        tryOpenApp();
+        return false;
       };
     } else if (openAppBtn) {
       openAppBtn.textContent = 'Event not found';
       openAppBtn.style.opacity = '0.5';
     }
+    
+    // Auto-try on page load (optional - can be removed if you want user to click button)
+    // setTimeout(tryOpenApp, 500);
   </script>
 </body>
 </html>
