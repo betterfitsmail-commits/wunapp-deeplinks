@@ -15,7 +15,15 @@
     {
       "source": "/profile/:username",
       "destination": "/profile.html"
+    },
+    {
+      "source": "/post/:id",
+      "destination": "/post.html"
+    },
+    {
+      "source": "/reset-password",
+      "destination": "/reset-password.html"
     }
-  ]
+  ],
+  ...
 }
-
